@@ -71,6 +71,23 @@
 
 ## 4. Security baseline
 
+**Tingkat risiko:** T1 / T2 / T3 — kontrol lengkap per tingkat ada di `references/keamanan.md` skill product-engineer.
+
+| OWASP Top 10:2025 | Kontrol utama di produk ini | Diuji dengan | Status |
+|---|---|---|---|
+| A01 Broken Access Control | Cek kepemilikan objek di server | Tes lintas user |  |
+| A02 Security Misconfiguration | Debug mati, header keamanan, CORS allowlist | `curl -sI` |  |
+| A03 Supply Chain | Lockfile, audit dependency | `npm audit` / `pip-audit` / … |  |
+| A04 Cryptographic Failures | HTTPS, hash password, enkripsi backup |  |  |
+| A05 Injection | Query berparameter, validasi skema, auto-escape |  |  |
+| A06 Insecure Design | Aturan bisnis di server, rate limit |  |  |
+| A07 Authentication Failures | Auth terkelola / NIST 800-63B-4 |  |  |
+| A08 Integrity Failures | Verifikasi webhook, SRI |  |  |
+| A09 Logging & Alerting | Log event keamanan tanpa PII, alert |  |  |
+| A10 Exceptional Conditions | Fail closed, error handler global, timeout |  |  |
+
+Checklist umum:
+
 - [ ] HTTPS di produksi.
 - [ ] Password di-hash dengan Argon2id/bcrypt atau auth terkelola.
 - [ ] Session/cookie aman (HttpOnly, Secure, SameSite).
@@ -138,3 +155,14 @@ Hanya isi yang relevan. Untuk produk internal sederhana, budget bisa berupa "hal
 | Tanggal | Reviewer | Temuan | Status |
 |---|---|---|---|
 |  |  |  |  |
+
+## 11. Log verifikasi
+
+Setiap gerbang dianggap lulus hanya jika ada barisnya di sini. Tulis perintah yang benar-benar dijalankan dan hasilnya.
+
+| Tanggal | Gerbang | Perintah / pemeriksaan | Hasil | Catatan |
+|---|---|---|---|---|
+|  | G2 | `python3 scripts/audit_rilis.py .` |  |  |
+|  | G4 | `python3 scripts/cek_slop.py .` + screenshot review 390/1280px |  |  |
+|  |  |  |  |  |
+

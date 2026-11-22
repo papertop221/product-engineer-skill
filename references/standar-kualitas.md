@@ -16,6 +16,8 @@ Fokuskan pengujian pada **jalur yang mahal jika rusak**: uang, data pribadi, aks
 
 ## 2. Strategi tes per jenis produk
 
+Ringkasan per jenis produk. Prinsip, kasus tepi, data uji, dan bukti ada di `pengujian.md`.
+
 ### Web app
 
 - Unit: validasi, perhitungan, transformasi data.
@@ -66,84 +68,54 @@ Review bukan pengganti tes. Tes bukan pengganti review.
 
 ## 4. Security baseline
 
-### Input dan output
+Detail lengkap per tingkat risiko (T1/T2/T3) ada di `keamanan.md`: OWASP Top 10:2025, auth (NIST SP 800-63B-4), secrets, upload, API, mobile, dan AI/LLM. Saat review, minimal pastikan:
 
-- Validasi tipe, panjang, format, dan rentang di server.
-- Encode output sesuai konteks (HTML, URL, JS, SQL).
-- Jangan percaya nama file, header, atau data dari client.
-- Batasi ukuran request dan upload.
+- Otorisasi per objek dicek di server (user A tidak bisa mengakses data user B).
+- Input divalidasi dengan skema di server; query berparameter; output di-encode.
+- Tidak ada secret di repo, frontend, log, atau prompt.
+- Error tidak membocorkan detail internal dan gagal secara aman (*fail closed*).
+- Dependency baru benar-benar ada, resmi, terawat, dan lolos audit.
+- Webhook diverifikasi dan diproses idempoten.
 
-### Database
+## 5. Aksesibilitas (target WCAG 2.2 AA untuk UI publik)
 
-- Query berparameter.
-- Constraint untuk aturan bisnis penting.
-- Least privilege untuk user database.
-- Jangan simpan password/token dalam plaintext.
-- Backup terenkripsi dan uji restore.
-
-### Auth dan session
-
-- Hash password dengan Argon2id/bcrypt.
-- Session/cookie: HttpOnly, Secure, SameSite.
-- CSRF protection untuk aksi yang mengubah data.
-- Rate limit login, reset password, dan endpoint publik.
-- Otorisasi di server, bukan hanya menyembunyikan UI.
-- Logout benar-benar menghapus session.
-
-### Web
-
-- HTTPS.
-- CORS allowlist.
-- Content Security Policy bila memungkinkan.
-- Jangan menaruh secret di frontend.
-- Lindungi dari XSS, clickjacking, dan open redirect.
-
-### File upload
-
-- Batasi tipe dan ukuran.
-- Simpan di luar webroot/object storage.
-- Nama file di-generate, bukan dari user.
-- Pindai bila file publik.
-- Jangan eksekusi file upload.
-
-### Dependency dan supply chain
-
-- Audit dependency berkala.
-- Hapus dependency yang tidak dipakai.
-- Pin versi di lockfile.
-- Hati-hati dengan package populer yang mencurigakan.
-- Jangan menjalankan script install dari sumber tidak tepercaya.
-
-### AI/LLM
-
-- Perlakukan output model sebagai input tidak tepercaya.
-- Jangan taruh secret, kredensial, atau data pribadi di prompt.
-- Batasi token, biaya, dan waktu.
-- Siapkan fallback saat model gagal/timeout.
-- Minta konfirmasi manusia untuk aksi berisiko.
-- Uji dengan prompt berbahaya dan input yang mencoba membocorkan instruksi.
-
-## 5. Aksesibilitas
-
-- HTML semantik: heading, button, label, table.
-- Semua input punya label yang terhubung.
-- Fokus keyboard terlihat dan urutannya masuk akal.
-- Kontras teks memadai.
+- HTML semantik: heading berurutan, `button` untuk aksi, `a` untuk navigasi, `label` untuk input, tabel untuk data tabular.
+- Semua input punya label yang terhubung; pesan error dekat dengan input dan diumumkan ke screen reader (`aria-live`/`aria-describedby`).
+- Semua fungsi bisa dipakai dengan keyboard; fokus terlihat jelas dan tidak tertutup elemen lengket (sticky header/banner).
+- Kontras teks minimal 4,5:1 (teks besar 3:1); komponen UI dan ikon penting 3:1.
+- Target sentuh minimal 24×24 px CSS (disarankan 44×44 untuk tombol utama).
+- Aksi drag punya alternatif klik/tap.
+- Form tidak meminta user mengetik ulang informasi yang sudah diberikan; login tidak mengandalkan tes kognitif (izinkan paste password dan password manager).
 - Gambar bermakna punya teks alternatif; gambar dekoratif `alt=""`.
 - Jangan mengandalkan warna saja untuk status.
-- Target sentuh cukup besar.
-- Animasi bisa dikurangi (`prefers-reduced-motion`).
-- Pesan error dekat dengan input dan mudah dibaca screen reader.
+- Tetap bisa dipakai saat zoom 200% dan di lebar 320 px tanpa scroll horizontal.
+- Animasi menghormati `prefers-reduced-motion`.
+- Cek otomatis dengan axe, lalu cek manual dengan keyboard. Alat otomatis hanya menangkap sebagian masalah.
 
 ## 6. Performa
 
-- Ukur dulu: waktu muat, waktu respons, query lambat, ukuran bundle.
-- Cari N+1 query.
-- Tambahkan index untuk query penting.
-- Lazy-load aset besar.
-- Kompresi gambar dan file.
-- Cache hanya jika ada bukti kebutuhan dan strategi invalidasi.
-- Tetapkan budget yang relevan; jangan optimasi spekulatif.
+Ukur dulu, baru optimasi. Budget default untuk web publik (persentil ke-75 kunjungan nyata, HP kelas menengah):
+
+| Metrik | Baik | Perlu perbaikan | Buruk |
+|---|---|---|---|
+| LCP (konten utama tampil) | ≤ 2,5 dtk | ≤ 4 dtk | > 4 dtk |
+| INP (respons interaksi) | ≤ 200 ms | ≤ 500 ms | > 500 ms |
+| CLS (layout bergeser) | ≤ 0,1 | ≤ 0,25 | > 0,25 |
+
+Budget default lain (sesuaikan di `docs/04-kualitas.md`):
+
+- JavaScript awal ≤ ~200 KB terkompresi untuk halaman utama.
+- API p95 ≤ 500 ms untuk endpoint interaktif; query DB utama ≤ 100 ms.
+- Gambar dalam format modern (WebP/AVIF) dengan ukuran sesuai tampilan, punya `width`/`height` (mencegah CLS), dan di-lazy-load di bawah lipatan.
+
+Praktik:
+
+- Cari N+1 query; tambahkan index untuk kolom yang dipakai di `WHERE`/`JOIN`/`ORDER BY` query utama.
+- Pagination untuk semua daftar yang bisa tumbuh.
+- Kompresi (gzip/brotli) dan cache header untuk aset statis berversi.
+- Pekerjaan berat (email, laporan, pemrosesan gambar) dipindah ke background job.
+- Cache aplikasi hanya jika ada bukti kebutuhan dan strategi invalidasinya jelas.
+- Jangan optimasi spekulatif.
 
 ## 7. Data dan integritas
 
@@ -180,7 +152,8 @@ Risiko yang diterima harus dicatat, bukan diabaikan.
 
 ## 10. Definisi "cukup baik untuk dirilis"
 
-- Tidak ada bug kritis/tinggi.
+- Tidak ada bug kritis/tinggi; risiko yang diterima tercatat.
+- Gerbang G0–G5 lulus dengan bukti di log verifikasi.
 - Alur utama teruji di lingkungan yang mirip produksi.
 - Backup dan rollback tersedia.
 - Error penting terpantau.

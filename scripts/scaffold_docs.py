@@ -5,7 +5,8 @@ Contoh:
     python3 scripts/scaffold_docs.py ~/proyek-saya \
         --nama "Kasir Warung" \
         --pemilik "Budi" \
-        --ringkasan "Aplikasi kasir sederhana untuk warung makan."
+        --ringkasan "Aplikasi kasir sederhana untuk warung makan." \
+        --publik
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_ROOT = SKILL_ROOT / "assets" / "templates"
 DOCS_TEMPLATE_DIR = TEMPLATE_ROOT / "docs"
 ROOT_README_TEMPLATE = TEMPLATE_ROOT / "README.md"
+LEGAL_TEMPLATE_DIR = TEMPLATE_ROOT / "legal"
 
 
 def parse_args() -> argparse.Namespace:
@@ -60,6 +62,11 @@ def parse_args() -> argparse.Namespace:
         "--no-readme",
         action="store_true",
         help="Jangan buat README.md di root proyek.",
+    )
+    parser.add_argument(
+        "--publik",
+        action="store_true",
+        help="Tambahkan draft dokumen legal (kebijakan privasi, syarat & ketentuan) ke docs/legal/.",
     )
     parser.add_argument(
         "--dry-run",
@@ -114,6 +121,13 @@ def main() -> int:
     for template in sorted(DOCS_TEMPLATE_DIR.glob("*.md")):
         targets.append((template, project / "docs" / template.name))
 
+    if args.publik:
+        if not LEGAL_TEMPLATE_DIR.is_dir():
+            print(f"Folder template legal tidak ditemukan: {LEGAL_TEMPLATE_DIR}", file=sys.stderr)
+            return 2
+        for template in sorted(LEGAL_TEMPLATE_DIR.glob("*.md")):
+            targets.append((template, project / "docs" / "legal" / template.name))
+
     if not args.no_readme and ROOT_README_TEMPLATE.is_file():
         targets.append((ROOT_README_TEMPLATE, project / "README.md"))
 
@@ -162,6 +176,8 @@ def main() -> int:
     if created:
         print(f"\nSelesai: {len(created)} file dibuat, {len(skipped)} dilewati.")
         print("Langkah berikutnya: isi docs/ dengan keputusan nyata, lalu tunjukkan docs/README.md ke user.")
+        if args.publik:
+            print("Dokumen legal di docs/legal/ adalah DRAFT: isi sesuai produk nyata dan minta pemilik meninjaunya.")
     elif skipped:
         print("\nTidak ada file baru. Semua target sudah ada.")
     else:

@@ -15,6 +15,8 @@ Tujuan panduan ini bukan membuat semua proyek memakai teknologi yang sama, tetap
 
 ## Tabel pemilihan berdasarkan jenis produk
 
+Tabel ini menjawab *bentuk* solusi. Untuk teknologi dan versi konkret yang direkomendasikan saat ini, lihat `teknis-modern.md` §2.
+
 | Jenis produk | Default paling murah | Kapan naik level | Catatan |
 |---|---|---|---|
 | Web app / SaaS | Framework full-stack dengan server rendering + PostgreSQL + auth terkelola + hosting terkelola | Jika butuh realtime berat, tim besar, atau skala besar | Hindari memisahkan frontend/backend untuk MVP kecil |
@@ -82,6 +84,24 @@ Jika membangun sendiri: hash password dengan Argon2id/bcrypt, jangan membuat cry
 | Form | Validasi dan state manual | Library form/validasi yang matang |
 | PDF/Excel | Render dari nol | Library yang sudah teruji |
 
+## Versi dan kematangan
+
+- Pilih versi **LTS/stabil** runtime dan framework (misalnya Node LTS genap, Python yang masih didukung). Hindari versi beta/RC untuk produksi.
+- Kunci versi runtime di repo (`.nvmrc`, `.python-version`, `rust-toolchain.toml`, `engines`) dan dependency lewat lockfile.
+- Sebelum memilih library: cek bahwa package ada di registry resmi, dirilis dalam 12 bulan terakhir, punya pemakai yang luas, lisensinya cocok, dan tidak punya advisori keamanan terbuka yang serius.
+- Ikuti dokumentasi resmi versi yang dipakai, bukan ingatan atau tutorial lama.
+
+## Konteks Indonesia
+
+| Kebutuhan | Default | Catatan |
+|---|---|---|
+| Pembayaran lokal | Payment gateway berizin BI (Midtrans, Xendit, DOKU, dan sejenisnya) untuk QRIS/VA/e-wallet | Lihat `siap-publik.md` §2; jangan memproses kartu sendiri |
+| Notifikasi chat | Telegram bot (gratis, cepat) atau email | WhatsApp Business Platform perlu verifikasi bisnis dan biaya per percakapan |
+| SMS/OTP | Hindari untuk MVP; gunakan email magic link/OAuth | SMS mahal dan rawan disalahgunakan |
+| Lokasi server | Region Singapura/Jakarta untuk latency rendah | Hosting di luar negeri termasuk transfer data menurut UU PDP; catat di kebijakan privasi |
+| Mobile | PWA dulu; jika perlu store, cross-platform (Flutter/React Native/Expo) | Play Store: closed test 12 tester × 14 hari untuk akun personal baru, target API terbaru, dan verifikasi developer |
+| Bahasa & format | `id-ID`: Rp tanpa desimal, tanggal `DD/MM/YYYY`, zona WIB/WITA/WIT | Simpan waktu dalam UTC, tampilkan sesuai zona user |
+
 ## Kapan menaikkan kompleksitas
 
 Naikkan hanya jika minimal satu benar:
@@ -126,3 +146,5 @@ Ini contoh, bukan keharusan. Pilih berdasarkan konteks.
 - [ ] Ada jalan keluar/migrasi data.
 - [ ] Dependency sedikit dan terawat.
 - [ ] Tim/user bisa merawatnya setelah serah terima.
+- [ ] Versi stabil/LTS dipakai dan dikunci.
+- [ ] Persyaratan platform/regulasi yang relevan sudah dicek (`siap-publik.md`).

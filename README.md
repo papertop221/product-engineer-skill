@@ -1,11 +1,12 @@
 # Product Engineer
 
-Skill untuk agent AI yang mengubah ide mentah menjadi produk software nyata: rencana lengkap, arsitektur, kode, tes, review, deploy, dan serah terima.
+Skill untuk agent AI yang mengubah ide mentah menjadi produk software nyata yang **siap dipakai publik**: rencana lengkap, arsitektur, kode yang aman, tes, review, kesiapan legal/rilis, deploy, dan serah terima.
 
 Dibuat untuk orang yang **tidak mau mengurus hal teknis**. Kamu cukup membawa ide dan penilaian produk; agent yang mengurus sisanya.
 
 ```
-Ide  →  Rencana  →  Fondasi  →  Bangun  →  Review  →  Deploy  →  Serah terima
+Ide → Rencana → Fondasi → Bangun → Verifikasi → Siap publik → Deploy → Serah terima
+ G0      G1        G2       G3        G4          G5          G6
 ```
 
 ## Masalah yang diselesaikan
@@ -16,21 +17,33 @@ Agent coding biasa langsung menulis kode. Hasilnya sering:
 - keputusan teknologi diambil tanpa alasan yang bisa dipertanggungjawabkan,
 - tidak ada tes, tidak ada rollback, tidak ada dokumentasi,
 - user tidak tahu cara menjalankan atau merawat hasilnya,
-- biaya bulanan baru ketahuan setelah tagihan datang.
+- biaya bulanan baru ketahuan setelah tagihan datang,
+- produk "jadi" tapi tidak siap publik: tanpa kebijakan privasi, webhook pembayaran tidak diverifikasi, ditolak store, atau secret bocor di repo.
 
-Skill ini memaksa urutan yang benar: **pahami → rencanakan → bangun sedikit → buktikan → deploy → serahkan**, dengan dokumen yang bisa dibaca manusia non-teknis.
+Hasilnya harus terasa dikerjakan developer senior, bukan AI generik: teknologi terkini yang matang, sistem UI dengan token desain, teks yang spesifik, dan kode tanpa pola khas AI (lihat `references/anti-ai-slop.md`).
+
+Skill ini memaksa urutan kerja developer profesional: **pahami → rencanakan → bangun sedikit → buktikan → siapkan rilis → deploy → serahkan**. Setiap fase punya gerbang (G0–G6) yang hanya lulus dengan bukti nyata, dan semua dokumennya bisa dibaca orang non-teknis.
+
+Ketatnya pemeriksaan menyesuaikan **tingkat risiko** produk:
+
+| Tingkat | Ciri | Contoh |
+|---|---|---|
+| T1 | Tanpa akun, data pribadi, atau uang | Landing page, kalkulator |
+| T2 | Ada akun atau data pribadi | SaaS kecil, aplikasi pencatatan |
+| T3 | Uang atau data sensitif | Pembayaran, e-commerce, klinik |
 
 ## Yang dilakukan skill
 
-| Fase | Hasil |
-|---|---|
-| 0. Terima ide | Tujuan, pengguna, batasan, dan asumsi yang eksplisit |
-| 1. Rencana lengkap | 7 dokumen proyek di `docs/` sebelum satu baris kode ditulis |
-| 2. Fondasi | Repo, stack paling sederhana yang cukup, konfigurasi aman |
-| 3. Vertical slice | Fitur inti yang benar-benar bisa dipakai, bukan mockup |
-| 4. Review & hardening | Tes, security check, performa, aksesibilitas |
-| 5. Deploy | CI/CD, secrets, backup, monitoring, rollback, smoke test |
-| 6. Serah terima | User bisa memakai dan merawat produk tanpa agent |
+| Fase | Hasil | Gerbang |
+|---|---|---|
+| 0. Pahami ide | Tujuan, pengguna, batasan, tingkat risiko T1/T2/T3 | G0 |
+| 1. Rencana lengkap | 8 dokumen di `docs/`, termasuk threat model, sebelum kode ditulis | G1 |
+| 2. Fondasi | Repo, versi terkunci, CI dengan gerbang otomatis, konfigurasi aman | G2 |
+| 3. Vertical slice | Fitur inti yang benar-benar bisa dipakai, dikerjakan dengan siklus test-first | G3 |
+| 4. Verifikasi & hardening | Tes, OWASP Top 10:2025, performa (Core Web Vitals), WCAG 2.2 AA, uji restore | G4 |
+| 5. Siap publik | Legal & privasi (UU PDP, PSE), pembayaran, email, SEO, store, anti-penyalahgunaan | G5 |
+| 6. Deploy | CI/CD, secrets, backup, monitoring/SLO, rollback, smoke test di URL nyata | G6 |
+| 7. Serah terima | User bisa memakai dan merawat produk, termasuk kalender perawatan | — |
 
 Dokumen yang selalu dibuat:
 
@@ -42,7 +55,9 @@ docs/
 ├── 03-roadmap.md        milestone, vertical slice, estimasi, progres
 ├── 04-kualitas.md       strategi tes, review, security baseline, performance budget
 ├── 05-deploy.md         hosting, CI/CD, secrets, backup, monitoring, rollback
-└── 06-serah-terima.md   cara pakai, operasi rutin, kredensial, batasan
+├── 06-serah-terima.md   cara pakai, operasi rutin, kalender perawatan, batasan
+├── 07-siap-rilis.md     production readiness review: legal, pembayaran, store, keputusan rilis
+└── legal/               (dengan --publik) draft kebijakan privasi + syarat & ketentuan
 ```
 
 ## Instalasi
@@ -133,22 +148,56 @@ Keputusan bisnis tetap milikmu. Keputusan teknis diambil agent dan dicatat alasa
 
 ```
 product-engineer-skill/
-├── SKILL.md                    definisi dan alur kerja skill
-├── install.sh                  installer untuk Claude, OpenCode, Codex, Antigravity
-├── assets/templates/           template 7 dokumen proyek + README proyek
+├── SKILL.md                         alur kerja, gerbang, dan aturan skill
+├── install.sh                       installer untuk Claude, OpenCode, Codex, Antigravity
+├── assets/templates/
+│   ├── docs/                        template 8 dokumen proyek
+│   ├── legal/                       draft kebijakan privasi + syarat & ketentuan
+│   └── README.md                    template README proyek
 ├── references/
-│   ├── panduan-stack.md        cara memilih stack dan layanan
-│   ├── standar-kualitas.md     standar kode, tes, dan review
-│   └── panduan-deploy.md       pola deploy, backup, dan rollback
-└── scripts/scaffold_docs.py    pembuat docs/ otomatis
+│   ├── alur-kerja-profesional.md    cara kerja developer profesional secara runtut
+│   ├── teknis-modern.md             stack terkini, arsitektur, data, API, React, error handling
+│   ├── sistem-ui.md                 sistem UI aplikasi: token, komponen, pola layar, microcopy
+│   ├── anti-ai-slop.md              larangan pola generik khas AI + gantinya
+│   ├── keamanan.md                  OWASP Top 10:2025, ASVS 5.0, NIST 800-63B-4, LLM Top 10
+│   ├── pengujian.md                 strategi tes, kasus tepi, smoke test, bukti
+│   ├── standar-kualitas.md          review, aksesibilitas, performa, severity
+│   ├── siap-publik.md               legal Indonesia, pembayaran, email, SEO, store
+│   ├── panduan-stack.md             cara memilih stack dan layanan
+│   └── panduan-deploy.md            CI/CD, backup, monitoring/SLO, rollback, perawatan
+└── scripts/
+    ├── scaffold_docs.py             pembuat docs/ otomatis
+    ├── audit_rilis.py               pemeriksaan otomatis kesiapan rilis
+    └── cek_slop.py                  deteksi sinyal AI slop di UI, teks, dan kode
 ```
 
 ### Scaffold dokumen
 
 ```bash
-python3 scripts/scaffold_docs.py /path/ke/project --name "Catatanku"
-python3 scripts/scaffold_docs.py /path/ke/project --dry-run
-python3 scripts/scaffold_docs.py /path/ke/project --force --no-readme
+python3 scripts/scaffold_docs.py /path/ke/project --nama "Catatanku"
+python3 scripts/scaffold_docs.py /path/ke/project --nama "Catatanku" --publik   # + draft legal
+python3 scripts/scaffold_docs.py /path/ke/project --nama "Catatanku" --dry-run
+python3 scripts/scaffold_docs.py /path/ke/project --nama "Catatanku" --force --no-readme
+```
+
+### Cek AI slop
+
+Mendeteksi sinyal hasil yang "terasa dibuat AI": gradasi ungu, teks bergradasi, glassmorphism berlebihan, emoji sebagai ikon, frasa klise ("solusi terdepan", "seamless"), konten/angka palsu, komentar narasi, catch kosong, `any`, API usang (moment, CRA, `middleware.ts` di Next 16, `tailwind.config` di v4), library ganda, dan pesan commit tidak informatif. Hasilnya sinyal untuk ditinjau, bukan vonis.
+
+```bash
+python3 scripts/cek_slop.py /path/ke/project
+python3 scripts/cek_slop.py /path/ke/project --ketat   # kode keluar 1 jika ada WARN (untuk CI)
+```
+
+### Audit kesiapan rilis
+
+Memeriksa secret yang bocor, `.env`/kunci privat yang ikut ter-commit, lockfile, versi runtime, tes, CI, dan dokumen. Skrip ini tidak mengubah file apa pun dan memberi kode keluar 1 jika ada FAIL, sehingga bisa dipasang di CI.
+
+```bash
+python3 scripts/audit_rilis.py /path/ke/project
+python3 scripts/audit_rilis.py /path/ke/project --publik          # + legal, siap-rilis, security.txt
+python3 scripts/audit_rilis.py /path/ke/project --jalankan-audit  # + npm/pnpm audit, pip-audit, cargo audit, govulncheck, gitleaks bila terpasang
+python3 scripts/audit_rilis.py /path/ke/project --json
 ```
 
 ## Uninstall

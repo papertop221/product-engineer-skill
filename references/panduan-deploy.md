@@ -28,22 +28,60 @@ Jangan memakai database produksi untuk pengujian. Jangan menyalin data pribadi p
 
 ## 3. CI/CD
 
-Pipeline minimum:
+Pipeline minimum (urutan = urutan gagal tercepat):
 
-1. Install dependency.
-2. Lint/format check.
+1. Install dependency dari lockfile (`npm ci`, `uv sync --locked`, `cargo build --locked`).
+2. Format check + lint.
 3. Type check (bila ada).
-4. Test.
-5. Build.
-6. Deploy staging (opsional otomatis).
-7. Deploy produksi (manual/approval).
+4. Tes unit + integration.
+5. Build artefak produksi.
+6. Audit dependency + secret scan.
+7. Deploy staging (otomatis dari `main`) → smoke test otomatis.
+8. Deploy produksi (manual/approval untuk T2/T3) memakai **artefak yang sama** dengan staging.
 
 Aturan:
 
 - Jangan deploy dari laptop jika CI tersedia.
-- Jangan menyimpan secret di file pipeline.
+- Jangan menyimpan secret di file pipeline; gunakan secret store platform.
 - Jangan melewati tes untuk "cepat".
-- Catat versi/commit yang di-deploy.
+- Token CI dengan izin minimum; versi action pihak ketiga di-pin.
+- Catat versi/commit yang di-deploy; tag rilis produksi (`v1.2.0`).
+- Lindungi branch `main`: CI wajib hijau sebelum merge.
+
+Contoh GitHub Actions untuk project Node (sesuaikan untuk ekosistem lain; cek versi action terbaru, lalu pin ke commit SHA untuk T2/T3):
+
+```yaml
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high
+```
+
+Untuk Python, ganti langkahnya dengan `uv sync --locked`, `ruff format --check`, `ruff check`, `mypy`, `pytest`, dan `pip-audit`. Untuk Rust: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test --locked`, dan `cargo audit`.
+
+### Strategi rilis
+
+- **Perubahan kecil dan sering** lebih aman daripada rilis besar yang jarang.
+- **Feature flag** untuk fitur yang belum siap atau berisiko; bisa dimatikan tanpa deploy ulang.
+- **Bertahap** bila platform mendukung: canary/persentase kecil → pantau error rate → naikkan.
+- **Migrasi database expand/contract**: (1) tambah kolom/tabel baru yang kompatibel, (2) deploy kode yang menulis ke keduanya, (3) migrasi data, (4) deploy kode yang hanya membaca yang baru, (5) hapus yang lama di rilis berikutnya. Jangan pernah menghapus atau mengganti nama kolom dalam deploy yang sama dengan kode yang masih memakainya.
 
 ## 4. Secrets
 
@@ -84,24 +122,30 @@ Backup belum berguna sampai pernah di-restore.
 - Catat masa berlaku domain/SSL.
 - Jangan mengubah DNS tanpa memahami dampaknya.
 
-## 8. Monitoring dan logging
+## 8. Monitoring, logging, dan SLO
 
-Minimal pantau:
+Minimal pantau empat sinyal emas: **traffic, error rate, latency, dan saturasi** (CPU/memori/koneksi DB/kuota). Tambahkan juga:
 
-- Ketersediaan (uptime).
-- Error aplikasi.
-- Performa respons.
-- Penggunaan resource.
-- Biaya.
-- Kegagalan job/webhook.
+- Ketersediaan dari luar (uptime check ke health endpoint dan halaman utama).
+- Error aplikasi dengan stack trace di server (misalnya Sentry), bukan di browser user.
+- Kegagalan job/webhook/email.
+- Biaya per layanan.
+
+SLO sederhana untuk MVP (tulis di `docs/05-deploy.md`):
+
+| SLO | Target contoh | Alert jika |
+|---|---|---|
+| Ketersediaan | 99,5% request sukses / 30 hari | Error rate 5xx > 2% selama 5 menit |
+| Latency | p95 < 500 ms | p95 > 1 dtk selama 10 menit |
+| Pembayaran (T3) | 100% webhook terverifikasi diproses | Ada webhook gagal > 3× berturut |
+| Job terjadwal | Selesai sesuai jadwal | Job tidak berjalan > 2× interval |
 
 Praktik:
 
-- Log terstruktur.
-- Sertakan request ID/korelasi bila memungkinkan.
-- Jangan log password, token, atau PII.
-- Alert harus bisa ditindaklanjuti; hindari alert banjir.
-- Siapkan jalur untuk melihat log dengan cepat saat insiden.
+- Log terstruktur (JSON) dengan level, waktu UTC, request ID, dan user ID (bukan email/nama).
+- Jangan log password, token, OTP, nomor kartu, atau PII lengkap.
+- Alert harus bisa ditindaklanjuti dan dikirim ke kanal yang benar-benar dibaca user/pengelola (email/Telegram/WhatsApp). Hindari alert banjir.
+- Retensi log ditentukan, misalnya 14–30 hari untuk log aplikasi dan lebih lama untuk audit log.
 
 ## 9. Rollback
 
@@ -199,6 +243,7 @@ Setelah rollback, verifikasi alur utama dan catat penyebabnya.
 2. Cek perubahan terakhir dan monitoring.
 3. Hentikan pendarahan: rollback, matikan fitur, atau batasi akses.
 4. Beri tahu user dengan bahasa manusia.
+   Jika data pribadi terdampak: siapkan pemberitahuan tertulis ke subjek data dan otoritas paling lambat 3 × 24 jam (UU PDP; lihat `siap-publik.md`). Keputusan dan pengirimannya dilakukan pemilik produk.
 5. Perbaiki akar masalah.
 6. Verifikasi pemulihan.
 7. Catat penyebab, perbaikan, dan pencegahan.
@@ -213,3 +258,17 @@ Setelah rollback, verifikasi alur utama dan catat penyebabnya.
 - [ ] Batasan dan risiko dicatat.
 - [ ] Kontak dukungan jelas.
 - [ ] Langkah berikutnya disepakati.
+
+## 16. Kalender perawatan
+
+Produk yang tidak dirawat akan rusak sendiri: dependency usang, sertifikat/domain kedaluwarsa, dan aturan store berubah. Sepakati kalender ini dengan user dan tulis di `docs/06-serah-terima.md`:
+
+| Frekuensi | Tugas |
+|---|---|
+| Harian (otomatis) | Backup, uptime check, alert error |
+| Mingguan | Cek error baru dan biaya; proses PR update dependency keamanan |
+| Bulanan | Update dependency minor; review akses akun; cek kuota/free tier |
+| Triwulan | **Uji restore backup**; rotasi secret penting; review log audit; cek header keamanan dan skor performa |
+| Tahunan | Perpanjangan domain; update runtime/framework mayor (LTS); naikkan target API Android (sekitar Agustus) dan SDK iOS (sekitar April); tinjau kebijakan privasi dan syarat; tinjau biaya hosting |
+| Saat ada advisori | Dependency kritis ≤ 7 hari, tinggi ≤ 30 hari |
+

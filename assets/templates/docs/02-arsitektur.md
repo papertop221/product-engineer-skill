@@ -90,6 +90,20 @@ Jelaskan tanggung jawab setiap folder utama.
 - **Kepatuhan/kebijakan:**
 - **Risiko utama:**
 
+### Threat model ringan
+
+**Aset yang dilindungi:** (data user, uang, akun admin, reputasi, …)
+**Batas kepercayaan:** (di mana data dari luar masuk: form, API, webhook, upload, AI)
+
+| Ancaman (STRIDE) | Skenario konkret | Mitigasi | Status |
+|---|---|---|---|
+| Spoofing |  |  |  |
+| Tampering |  |  |  |
+| Repudiation |  |  |  |
+| Information disclosure |  |  |  |
+| Denial of service |  |  |  |
+| Elevation of privilege |  |  |  |
+
 ## 9. Error handling, logging, dan observability
 
 - Error yang ditangani user:

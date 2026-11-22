@@ -63,6 +63,15 @@ Tulis untuk user non-teknis. Jelaskan alur utama dengan langkah bernomor, termas
 | Update dependency |  |  |  |
 | Tambah user/admin |  |  |  |
 
+### Kalender perawatan
+
+| Frekuensi | Tugas | Siapa |
+|---|---|---|
+| Mingguan | Cek error baru dan biaya; proses update keamanan dependency |  |
+| Bulanan | Update dependency minor; review akses akun |  |
+| Triwulan | Uji restore backup; rotasi secret penting; cek performa dan header keamanan |  |
+| Tahunan | Perpanjang domain; update runtime/framework mayor; naikkan target API Android / SDK iOS; tinjau kebijakan privasi |  |
+
 ## 6. Akun dan kredensial
 
 | Layanan | Pemilik akun | Di mana kredensial disimpan | Akses darurat |
