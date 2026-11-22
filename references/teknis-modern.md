@@ -1,16 +1,55 @@
 # Rekayasa Teknis Tingkat Senior
 
-Cara developer senior menulis software di 2026: teknologi default yang sehat, pola arsitektur, data, API, frontend, dan error handling. Prinsip di dokumen ini tahan lama. **Versi** spesifik adalah potret per November 2026 dan wajib dicek ulang ke dokumentasi resmi sebelum `install`.
+Cara developer senior menulis software: memilih teknologi terbaik **pada saat itu**, pola arsitektur, data, API, frontend, dan error handling. Prinsip dan pola di dokumen ini tahan lama. **Nama teknologi dan nomor versi di dalamnya hanya potret (November 2026) untuk titik awal, bukan kebenaran.** Teknologi terbaru dan terbaik ditentukan lewat riset langsung setiap kali skill ini dipakai, dengan protokol di §0.
+
+## 0. Protokol "teknologi terbaru saat ini" (wajib di Fase 0–2)
+
+Jangan memilih stack dari ingatan atau dari tabel di dokumen ini. Lakukan langkah ini setiap proyek baru, dan setiap kali menambah teknologi baru yang penting:
+
+1. **Tanggal hari ini** diketahui dari konteks sesi. Semua pencarian memakai tahun/bulan saat ini.
+2. **Cari lanskap terkini** untuk jenis produk ini (web search): "best [framework/stack] for [jenis produk] [tahun]", hasil survei terbaru (State of JS/CSS, Stack Overflow Developer Survey, JetBrains, Thoughtworks Radar), dan catatan rilis framework utama. Utamakan sumber resmi dan survei, lalu perbandingan dari praktisi. Waspadai artikel promosi dan tulisan yang sudah lama.
+3. **Ambil versi stabil terbaru langsung dari registry**, bukan dari ingatan:
+   ```bash
+   python3 scripts/cek_versi.py next react tailwindcss          # npm
+   python3 scripts/cek_versi.py --pypi fastapi pydantic         # PyPI
+   python3 scripts/cek_versi.py --crates axum                   # crates.io
+   python3 scripts/cek_versi.py --node                          # Node LTS aktif
+   ```
+   Jika tidak ada jaringan, pakai `npm view <paket> version`, `pip index versions <paket>`, atau `cargo search`; jika tetap tidak bisa, katakan terus terang bahwa versi tidak terverifikasi.
+4. **Baca dokumentasi resmi versi itu** (getting started + migration guide mayor terakhir). API dan konvensi sering berubah antar-mayor; pola yang kamu ingat bisa sudah usang.
+5. **Uji kecocokan:** apakah versi-versi itu saling kompatibel (peer dependency), apakah runtime di hosting yang dipilih mendukungnya, dan apakah ada advisori keamanan terbuka.
+6. **Pilih berdasarkan kriteria, bukan tren:**
+
+   | Kriteria | Pertanyaan |
+   |---|---|
+   | Kematangan | Rilis stabil (bukan alpha/beta/canary), sudah dipakai produksi luas? |
+   | Perawatan | Rilis dalam ~6 bulan terakhir, isu ditanggapi, ada lebih dari satu maintainer atau perusahaan di belakangnya? |
+   | Kecocokan | Memenuhi kebutuhan produk ini tanpa fitur spekulatif? |
+   | Biaya total | Deploy, belajar, dan merawatnya murah bagi user? Ada jalan keluar (tidak terkunci vendor)? |
+   | Ekosistem | Dokumentasi, library pendukung, dan komunitas cukup? |
+   | Keamanan | Rekam jejak advisori, dukungan LTS/patch? |
+   | Lingkungan | Berjalan di lingkungan user dan hosting yang dipilih? |
+
+7. **Catat hasilnya** di `docs/02-arsitektur.md` (ADR): teknologi, versi yang diverifikasi, **tanggal verifikasi**, sumber, alasan, dan alternatif yang ditolak. Tanggal ini membuat keputusan bisa diaudit dan diperbarui.
+
+Aturan pelengkap:
+
+- **Stabil mengalahkan terbaru.** "Terbaru" berarti rilis stabil terbaru dari lini yang matang. Jangan memakai pra-rilis untuk produksi; jangan memakai rilis mayor yang baru keluar dalam hitungan hari tanpa alasan kuat, dan tunggu patch pertama bila risikonya tinggi.
+- **Teknologi baru yang menjanjikan** boleh dipakai jika lolos kriteria di atas dan keunggulannya nyata bagi produk ini. Jika tidak, catat sebagai kandidat di backlog.
+- **Project yang sudah ada:** jangan upgrade mayor tanpa alasan dan persetujuan; rencanakan upgrade sebagai pekerjaan terpisah dengan migration guide dan tes.
+- **Lingkungan terbatas (misalnya Termux/Android):** pilih runtime yang tersedia di sana, atau jalankan build di CI/layanan remote.
 
 ## 1. Memilih teknologi seperti senior
 
 - **Boring by default.** Pilih teknologi yang matang, terdokumentasi, dan banyak dipakai. Yang baru boleh dipakai jika memecahkan masalah nyata yang tidak bisa dipecahkan yang lama.
 - **Satu cara untuk satu hal.** Satu library state server, satu library form, satu set ikon, satu ORM. Dua cara untuk hal yang sama adalah tanda project tanpa pemimpin.
-- **Ikuti versi stabil terbaru dari major yang dipilih**, dengan API yang direkomendasikan dokumentasi saat ini, bukan pola lama dari tutorial atau ingatan.
+- **Ikuti versi stabil terbaru** hasil protokol §0, dengan API yang direkomendasikan dokumentasi saat ini, bukan pola lama dari tutorial atau ingatan.
 - **Baca changelog/migration guide** sebelum memakai framework yang baru naik major (misalnya Next.js 16 mengganti `middleware.ts` menjadi `proxy.ts`).
 - **Jangan mencampur generasi.** Misalnya jangan memakai `tailwind.config.js` gaya v3 di project Tailwind v4, Pages Router dan App Router sekaligus tanpa alasan migrasi, atau `moment.js` di samping `Intl`/`date-fns`.
 
-## 2. Potret stack default (November 2026, cek ulang)
+## 2. Potret stack sebagai titik awal (November 2026; verifikasi dengan §0)
+
+Tabel ini hanya **hipotesis awal** untuk dipercepat riset. Jika hasil §0 menunjukkan ada yang lebih baik, sudah usang, atau diganti, ikuti hasil riset dan tulis alasannya di ADR.
 
 | Kebutuhan | Default yang sehat | Alternatif bagus | Hindari untuk project baru |
 |---|---|---|---|
@@ -190,7 +229,8 @@ Aturan:
 
 ## 13. Checklist teknis sebelum menyatakan selesai
 
-- [ ] Stack dan versi sesuai rekomendasi resmi terkini; tidak ada API usang atau campuran generasi.
+- [ ] Protokol §0 dijalankan: versi diambil dari registry, dokumentasi resmi dibaca, ADR mencatat versi + tanggal verifikasi.
+- [ ] Tidak ada API usang atau campuran generasi.
 - [ ] Tipe strict lulus tanpa `any`/`ts-ignore`.
 - [ ] Input dari luar di-parse dengan skema di batas sistem.
 - [ ] Skema DB punya constraint, index, dan tipe yang benar (uang bukan float, waktu `timestamptz`).

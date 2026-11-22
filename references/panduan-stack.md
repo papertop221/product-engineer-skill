@@ -86,6 +86,8 @@ Jika membangun sendiri: hash password dengan Argon2id/bcrypt, jangan membuat cry
 
 ## Versi dan kematangan
 
+> Nama dan versi di panduan ini adalah potret November 2026. Saat memilih, jalankan protokol riset terkini di `teknis-modern.md` §0 dan ikuti hasilnya.
+
 - Pilih versi **LTS/stabil** runtime dan framework (misalnya Node LTS genap, Python yang masih didukung). Hindari versi beta/RC untuk produksi.
 - Kunci versi runtime di repo (`.nvmrc`, `.python-version`, `rust-toolchain.toml`, `engines`) dan dependency lewat lockfile.
 - Sebelum memilih library: cek bahwa package ada di registry resmi, dirilis dalam 12 bulan terakhir, punya pemakai yang luas, lisensinya cocok, dan tidak punya advisori keamanan terbuka yang serius.

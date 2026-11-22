@@ -61,7 +61,7 @@ Jangan bilang "selesai", "berfungsi", atau "aman" tanpa bukti yang dijalankan: o
 AI mempercepat penulisan kode, tetapi juga memperbesar kesalahan yang tidak dicek. Perlakukan kode yang kamu tulis sendiri seperti PR dari orang lain:
 
 - Pastikan setiap package benar-benar ada, resmi, dan terawat **sebelum** dipasang. Nama package hasil tebakan bisa jadi milik penyerang (*slopsquatting*).
-- Pastikan setiap API/fungsi library benar-benar ada di versi yang terpasang. Baca dokumentasi atau source-nya; jangan mengandalkan ingatan.
+- Pastikan setiap API/fungsi library benar-benar ada di versi yang terpasang. Baca dokumentasi atau source-nya; jangan mengandalkan ingatan, karena pengetahuanmu punya tanggal batas dan teknologi terus berubah.
 - Review diff dengan niat mencari kesalahan, bukan untuk membenarkan diri sendiri. Gunakan reviewer independen bila tersedia.
 
 ### 6. Lindungi user
@@ -78,7 +78,7 @@ Model cenderung kembali ke pola paling rata-rata: gradasi ungu, kartu di mana-ma
 
 - **Setiap pilihan punya alasan.** Warna, font, kepadatan, library, dan abstraksi dipilih untuk produk ini. Jika tidak bisa dijelaskan, itu default, bukan keputusan.
 - **Spesifik mengalahkan generik.** Pakai istilah domain user, data contoh realistis (nama Indonesia, nominal nyata), dan teks yang menyebut apa yang dilakukan produk untuk siapa.
-- **Teknologi terkini yang matang**, dengan API yang direkomendasikan dokumentasi resmi saat ini, bukan pola usang dari ingatan.
+- **Teknologi terbaru yang stabil pada saat skill ini dipakai**, bukan yang tertulis di dokumen. Cari lanskap terkini lewat web search, ambil versi langsung dari registry (`scripts/cek_versi.py`), dan baca dokumentasi resminya. Protokol lengkap di `references/teknis-modern.md` §0.
 - **Kode membosankan dengan cara yang baik:** nama jelas, sedikit komentar (hanya "kenapa"), error ditangani di batas sistem, tanpa abstraksi untuk satu pemakaian, dan diff yang sebanding dengan tugasnya.
 - **Jujur:** tidak ada angka, testimoni, fitur, atau data palsu.
 
@@ -149,7 +149,7 @@ Fondasi harus hijau sebelum fitur pertama ditulis.
 - Formatter, linter, type checker (mode strict bila tersedia), dan test runner. Konfigurasi seminimal mungkin.
 - **Validasi konfigurasi saat start**: aplikasi langsung gagal dengan pesan jelas jika env var wajib tidak ada. `.env.example` hanya berisi nama variabel dan contoh palsu.
 - CI yang menjalankan gerbang otomatis di setiap push/PR: format check, lint, type check, tes, build, audit dependency, dan secret scan. Contohnya ada di `references/panduan-deploy.md`.
-- Stack dan versi mengikuti `references/teknis-modern.md` (cek dokumentasi resmi terbaru sebelum install). Satu cara untuk satu hal: satu library ikon, form, tanggal, dan state server.
+- Pilih stack dengan **protokol riset terkini** `references/teknis-modern.md` §0 (web search + `cek_versi.py` + dokumentasi resmi); tabel di dokumen hanya titik awal. Catat versi dan tanggal verifikasi di ADR. Satu cara untuk satu hal: satu library ikon, form, tanggal, dan state server.
 - Struktur folder per fitur (modular monolith); handler tipis, logika bisnis di fungsi murni. Pakai satu perintah untuk `install`, `dev`, `test`, `build`, dan `start`.
 - Untuk produk ber-UI: **token desain** (warna OKLCH, tipografi, jarak, radius) dan komponen dasar dibuat sebelum layar pertama, mengikuti `references/sistem-ui.md`.
 - Seed data realistis + akun demo untuk setiap peran.
@@ -338,6 +338,7 @@ Semua path relatif terhadap folder skill ini. Baca referensi saat fasenya tiba, 
 - `assets/templates/` — template dokumen proyek, README, dan dokumen legal.
 - `scripts/scaffold_docs.py` — membuat kerangka `docs/`.
 - `scripts/audit_rilis.py` — pemeriksaan otomatis kesiapan rilis: secret bocor, `.env` ter-commit, lockfile, tes, CI, dokumen.
+- `scripts/cek_versi.py` — versi stabil terbaru langsung dari registry (npm, PyPI, crates.io, Node LTS); juga membandingkan dependency project dengan yang terbaru.
 - `scripts/cek_slop.py` — deteksi sinyal AI slop: gradasi ungu, teks klise, konten palsu, komentar narasi, catch kosong, `any`, API usang, dan library ganda.
 
 ```bash
@@ -345,4 +346,5 @@ python3 scripts/scaffold_docs.py ~/proyek-saya --nama "Kasir Warung" --pemilik "
 python3 scripts/audit_rilis.py ~/proyek-saya            # gerbang G2/G4/G5
 python3 scripts/audit_rilis.py ~/proyek-saya --publik   # tambah pemeriksaan rilis publik
 python3 scripts/cek_slop.py ~/proyek-saya               # gerbang G4: review anti-slop
+python3 scripts/cek_versi.py next react --proyek ~/proyek-saya   # versi terbaru dari registry
 ```

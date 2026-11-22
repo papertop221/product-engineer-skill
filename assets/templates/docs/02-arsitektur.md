@@ -8,16 +8,18 @@ Jelaskan dalam 3–5 kalimat: bentuk aplikasi, komponen utama, dan bagaimana dat
 
 ## 2. Stack dan alasan
 
-| Lapisan | Pilihan | Alasan | Alternatif yang ditolak |
-|---|---|---|---|
-| Bahasa |  |  |  |
-| Frontend |  |  |  |
-| Backend |  |  |  |
-| Database |  |  |  |
-| Auth |  |  |  |
-| Hosting |  |  |  |
-| Testing |  |  |  |
-| Observability |  |  |  |
+> Setiap pilihan diverifikasi dengan protokol riset terkini (`references/teknis-modern.md` §0): versi diambil dari registry dan dokumentasi resmi dibaca pada tanggal yang dicatat.
+
+| Lapisan | Pilihan | Versi terverifikasi | Tanggal cek | Alasan | Alternatif yang ditolak |
+|---|---|---|---|---|---|
+| Bahasa |  |  |  |  |  |
+| Frontend |  |  |  |  |  |
+| Backend |  |  |  |  |  |
+| Database |  |  |  |  |  |
+| Auth |  |  |  |  |  |
+| Hosting |  |  |  |  |  |
+| Testing |  |  |  |  |  |
+| Observability |  |  |  |  |  |
 
 ## 3. Diagram alur
 
@@ -137,6 +139,7 @@ Jelaskan environment lokal, staging, dan produksi; komponen apa saja yang berjal
 ### ADR-001 — [Judul keputusan]
 
 - **Konteks:**
+- **Sumber & tanggal riset:** (link dokumentasi/survei, tanggal)
 - **Keputusan:**
 - **Alasan:**
 - **Konsekuensi:**

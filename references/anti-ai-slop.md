@@ -73,7 +73,7 @@ Gantinya:
 | Tes yang hanya mengetes mock, atau assertion lemah (`expect(result).toBeDefined()`) | Hijau palsu | Tes perilaku dengan assertion bermakna (`pengujian.md`) |
 | `sleep`/`setTimeout` untuk "memperbaiki" race condition | Flaky dan menyembunyikan bug | Tunggu kondisi/event yang tepat |
 | Menulis ulang fitur yang sudah ada di platform/library | Lebih banyak bug, lebih banyak kode | Pakai yang ada (`Intl`, `URLSearchParams`, `crypto.randomUUID`, komponen headless) |
-| API usang dari ingatan (Pages Router untuk project baru, `getServerSideProps`, `tailwind.config.js` di v4, `moment`, `request`, Create React App) | Utang teknis sejak hari pertama | Cek dokumentasi resmi versi yang dipakai |
+| API usang dari ingatan, karena pengetahuan model punya tanggal batas (Pages Router untuk project baru, `getServerSideProps`, `tailwind.config.js` di v4, `moment`, `request`, Create React App) | Utang teknis sejak hari pertama | Cek dokumentasi resmi versi yang dipakai |
 | File 1.000 baris berisi semuanya | Sulit dibaca, di-review, dan dites | Pecah per fitur/tanggung jawab |
 | Gaya campur aduk (async/await + `.then`, dua cara fetch, dua library tanggal) | Terasa dikerjakan banyak "orang" tanpa arah | Satu konvensi, ditulis di README/ADR |
 

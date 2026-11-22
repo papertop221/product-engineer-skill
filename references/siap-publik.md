@@ -2,7 +2,7 @@
 
 Kode yang benar belum tentu berarti produk siap dipakai orang lain. Dokumen ini berisi semua hal **di luar kode** yang biasanya membuat produk gagal, diblokir, ditolak store, atau menimbulkan masalah hukum setelah rilis. Isi hasilnya di `docs/07-siap-rilis.md`.
 
-> **Penting — fakta yang cepat berubah.** Aturan platform dan regulasi di bawah dicatat per **November 2026**. Sebelum rilis, selalu cek ulang ke sumber resmi yang disebut, lalu catat tanggal pengecekannya di `docs/07-siap-rilis.md`. Hal legal disampaikan ke user sebagai **draft dan informasi, bukan nasihat hukum**. Untuk produk T3, sarankan konsultasi dengan konsultan hukum.
+> **Penting — fakta yang cepat berubah.** Aturan platform dan regulasi di bawah dicatat per **November 2026** dan akan berubah (target API, syarat testing, regulasi PDP, tarif). Jangan menjadikannya acuan final: **cari aturan yang berlaku pada tanggal sesi ini** lewat web search ke sumber resmi. Sebelum rilis, selalu cek ulang ke sumber resmi yang disebut, lalu catat tanggal pengecekannya di `docs/07-siap-rilis.md`. Hal legal disampaikan ke user sebagai **draft dan informasi, bukan nasihat hukum**. Untuk produk T3, sarankan konsultasi dengan konsultan hukum.
 
 ## 1. Legal dan privasi (Indonesia)
 

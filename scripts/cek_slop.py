@@ -246,6 +246,8 @@ def scan(root: Path) -> Report:
             r.add("WARN", "token", msg, h)
 
     # ---- teknologi usang / campuran generasi
+    # CATATAN: daftar di bawah adalah potret (Nov 2026) dan akan menua. Jangan jadikan acuan tunggal:
+    # teknologi terkini ditentukan lewat protokol riset (references/teknis-modern.md §0 + cek_versi.py).
     def major(name: str) -> int | None:
         m = re.search(r"(\d+)", pkg_deps.get(name, ""))
         return int(m.group(1)) if m else None
